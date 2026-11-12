@@ -1,0 +1,145 @@
+{
+  "schema": "track-fragment/0.1",
+  "name": "track.wang.json",
+  "owner": "王梓钰（三维资产）",
+  "week": "2026-11-11..2026-11-15",
+  "status": "计划完成（周内交付，待组内尺寸确认）",
+  "scope": "仅坡道定点停车与起步 / 曲线行驶 / 直角转弯 三个项目；倒库、侧方、车模属陈林楠，不在此文件",
+  "mergeInto": "林呈睿维护的 track.json；本文件是待合并的片段，不覆盖他人字段",
+  "units": { "length": "m", "angle": "rad", "time": "s", "mass": "kg" },
+  "frame": {
+    "axes": "各项目局部坐标：x=行车方向(纵向)，y=横向(左为正)，z=竖直向上",
+    "vehicleReference": "后轴中心；theta 为车头方向（规则表 §1）",
+    "handedness": "右手系，俯视时 y 向上",
+    "tol": 0.02,
+    "deadzone": 0.03,
+    "markingWidth": 0.15,
+    "markingWidthSource": "GA 1029 图形线宽 150mm±5mm（除坡道桩杆线外）",
+    "note": "cm / 度 / km/h 只允许出现在输入解析与 UI，内部一律 m / rad / s"
+  },
+  "vehicle": {
+    "model": "大众新桑塔纳",
+    "length": 4.473,
+    "width": 1.706,
+    "height": 1.469,
+    "wheelbase": 2.603,
+    "frontOverhang": 0.870,
+    "rearOverhang": 1.000,
+    "trackWidth": 1.420,
+    "source": "科目二扣分规则表-对内版 v0.4 §7.2 / §10"
+  },
+  "sourcePriority": [
+    "GA 1029—2022《机动车驾驶人考试场地及其设施设置规范》表10/11/12、图9/10/11",
+    "GA 1026—2022《机动车驾驶人考试内容和方法》5.2 / 6.2.3",
+    "科目二扣分规则表-对内版 v0.4 §1 §2 §3 §4",
+    "本周任务分配-20261111 v3（王梓钰任务行）",
+    "GB/T 30341—2013《机动车驾驶员培训教练场技术要求》（教练场口径，仅作交叉核对）"
+  ],
+  "projects": {
+    "hill_start": {
+      "label": "坡道定点停车与起步",
+      "clauses": {
+        "operation": "GA 1026—2022 5.2.4",
+        "judging": "GA 1026—2022 6.2.3.3",
+        "geometry": "GA 1029—2022 表10 / 图9"
+      },
+      "rules": ["R02", "R03", "R09", "R10", "R11", "R12"],
+      "grade": 0.10,
+      "angleRad": 0.09966865249116204,
+      "angleDeg": 5.710593137499642,
+      "slopeLength": 20.0,
+      "horizontalRun": 19.900743804199786,
+      "rise": 1.9900743804199786,
+      "laneWidth": 3.20,
+      "flatBefore": 4.0,
+      "flatAfter": 4.0,
+      "stopPoleLineWidth": 0.30,
+      "controlLineToPoleLineCenter": 0.65,
+      "controlLineToPoleLineEdge": 0.50,
+      "controlLinePair": true,
+      "poleLineFromSlopeFoot": 17.0,
+      "poleLineFromSlopeFootMin": 6.7095,
+      "verticalCurveRadiusMin": 20.0,
+      "verticalCurveModeled": false,
+      "poleRadius": 0.05,
+      "poleHeight": 1.5,
+      "poleCount": 2,
+      "totalLengthX": 27.900743804199786,
+      "note": "0.65（任务表 / 图设计 S1,S2，到桩杆线中心）与 0.50（GA 1029 表10 d，到桩杆线边缘）并不冲突：0.65 - 0.30/2 = 0.50。两个口径同时满足。"
+    },
+    "s_curve": {
+      "label": "曲线行驶",
+      "clauses": {
+        "operation": "GA 1026—2022 5.2.6",
+        "judging": "GA 1026—2022 6.2.3.5",
+        "geometry": "GA 1029—2022 表11 / 图10；弧长 3/8 圆周见 GB/T 30341—2013"
+      },
+      "rules": ["R02", "R03"],
+      "outerRadius": 7.5,
+      "innerRadius": 4.0,
+      "roadWidth": 3.5,
+      "arcAngleRad": 2.356194490192345,
+      "arcAngleDeg": 135.0,
+      "arcFraction": "3/8 圆周",
+      "centerDistance": 11.5,
+      "entryStraight": 3.0,
+      "exitStraight": 3.0,
+      "displayRotationRad": -1.5707963267948966,
+      "arcs": [
+        {
+          "id": "arc1",
+          "center": [7.5, 0.0],
+          "startAngle": -3.141592653589793,
+          "endAngle": -0.7853981633974483,
+          "direction": "ccw",
+          "outerRadius": 7.5,
+          "innerRadius": 4.0
+        },
+        {
+          "id": "arc2",
+          "center": [15.631727983645298, -8.131727983645298],
+          "startAngle": 2.356194490192345,
+          "endAngle": 0.0,
+          "direction": "cw",
+          "outerRadius": 7.5,
+          "innerRadius": 4.0
+        }
+      ],
+      "note": "r=7.5 为外圆半径，内圆 4.0 = 7.5-3.5；两圆心距 11.5 = 7.5+4.0，反向弧在拐点切向相接。判定层必须用解析圆，不得离散成折线（规则表 3.R02）。"
+    },
+    "right_angle": {
+      "label": "直角转弯",
+      "clauses": {
+        "operation": "GA 1026—2022 5.2.7",
+        "judging": "GA 1026—2022 6.2.3.6",
+        "geometry": "GA 1029—2022 表12 / 图11"
+      },
+      "rules": ["R02", "R03", "R13"],
+      "roadWidth": 3.60,
+      "approachLength": 6.71,
+      "approachLengthSource": "本周任务分配 v3；数值 = 1.5×车长 = 1.5×4.473 = 6.7095≈6.71（GB/T 30341 教练场口径）",
+      "ga1029MinLength": 6.8,
+      "innerCornerFillet": 0.0,
+      "cornerAngleDeg": 90.0,
+      "note": "图11 内外角均为尖角（无倒角），本周按尖角建模。内轮差是判定层 R02 的事，白模不画圆弧。"
+    }
+  },
+  "dimensionChecks": [
+    { "name": "坡道 坡度", "taskDoc": 0.10, "ga1029": 0.10, "modeled": 0.10, "verdict": "一致" },
+    { "name": "坡道 坡长(m)", "taskDoc": 20.0, "ga1029": "≥20", "modeled": 20.0, "verdict": "一致（取下限）" },
+    { "name": "坡道 车道宽(m)", "taskDoc": null, "ga1029": "≥3.2", "modeled": 3.2, "verdict": "任务表未给，取国标下限，待考场平面图核对" },
+    { "name": "坡道 桩杆线宽(m)", "taskDoc": 0.30, "ga1029": 0.30, "modeled": 0.30, "verdict": "一致" },
+    { "name": "坡道 控制线到桩杆线(m)", "taskDoc": 0.65, "ga1029": 0.50, "modeled": "0.65(中心)/0.50(边缘)", "verdict": "口径不同但自洽：0.65-0.30/2=0.50" },
+    { "name": "曲线 外圆半径(m)", "taskDoc": 7.5, "ga1029": 7.5, "modeled": 7.5, "verdict": "一致" },
+    { "name": "曲线 路宽(m)", "taskDoc": 3.5, "ga1029": 3.5, "modeled": 3.5, "verdict": "一致" },
+    { "name": "曲线 每段弧(deg)", "taskDoc": 135, "ga1029": "3/8 圆周 = 135", "modeled": 135, "verdict": "一致" },
+    { "name": "直角 路宽(m)", "taskDoc": 3.60, "ga1029": 3.6, "modeled": 3.60, "verdict": "一致（=轴距2.603+1.0=3.603，取两位）" },
+    { "name": "直角 转弯前直段(m)", "taskDoc": 6.71, "ga1029": "≥6.8", "modeled": 6.71, "verdict": "按任务表建模；国标现行下限 6.8，差 0.09m，待组内确认是否上调" }
+  ],
+  "openQuestions": [
+    "直角直段 6.71 是否上调到 GA 1029 现行下限 6.8？改 approachLength 一个参数重跑生成器即可。",
+    "坡道车道宽 3.2 是否符合北京某考场公示平面图？谭云嘉拿到图后核对。",
+    "桩杆线沿坡位置 17.0m：标准只给下限 6.71m，图9 要求'坡顶缓坡以下'，本周取靠近坡顶；请组内确认。",
+    "坡道竖曲线（r≥20m）本周省略，按直坡建模；12 月做材质那周补。"
+  ]
+}

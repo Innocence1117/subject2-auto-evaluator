@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>轮廓坐标 → Canvas 2D 对接验证页（非原型）</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 28px 32px 40px; background: #f7f8fa; color: #1c2026;
+         font: 14px/1.6 "Microsoft YaHei", "PingFang SC", system-ui, sans-serif; }
+  h1 { font-size: 21px; margin: 0 0 6px; }
+  .sub { color: #5f6770; margin: 0 0 18px; font-size: 13px; }
+  .bar { display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+         background: #fff; border: 1px solid #e3e7ec; border-radius: 10px;
+         padding: 12px 16px; margin-bottom: 18px; }
+  .bar label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+  .badge { background: #eaf2fd; color: #1858a5; border: 1px solid #cfe0f6;
+           border-radius: 6px; padding: 2px 9px; font-size: 12px; }
+  .badge.ok { background: #e9f6ed; color: #1d7a3c; border-color: #c9e9d4; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 16px; }
+  .card { background: #fff; border: 1px solid #e3e7ec; border-radius: 10px; padding: 14px; }
+  .card h2 { font-size: 15px; margin: 0 0 4px; }
+  .card p { margin: 0 0 10px; color: #5f6770; font-size: 12px; }
+  canvas { width: 100%; height: auto; display: block; background: #fff;
+           border: 1px solid #eef1f4; border-radius: 6px; }
+  pre { background: #fff; border: 1px solid #e3e7ec; border-radius: 10px;
+        padding: 12px 16px; font-size: 12px; color: #333; white-space: pre-wrap; margin-top: 18px; }
+</style>
+</head>
+<body>
+<h1>轮廓坐标 → Canvas 2D 对接验证页</h1>
+<p class="sub">王梓钰 → 叶惠坤｜只验证「坐标能不能直接喂进 Canvas 2D」，不是 12 月底的原型。数据：<code>outline/outline.js</code>（由 <code>track/track.wang.json</code> 生成）。</p>
+
+<div class="bar">
+  <span class="badge" id="status">载入中…</span>
+  <label><input type="checkbox" id="showArcs"> 叠加解析圆弧（判定用）</label>
+  <label><input type="checkbox" id="showIds" checked> 标出标线 id</label>
+  <span style="color:#5f6770;font-size:12px">y 轴已翻转；比例自动适配各项目包围盒</span>
+</div>
+
+<div class="grid" id="grid"></div>
+<pre id="log"></pre>
+
+<script src="../outline/outline.js"></script>
+<script>
+(function () {
+  const log = [];
+  const say = s => { log.push(s); document.getElementById('log').textContent = log.join('\n'); };
+  const D = window.TRACK_OUTLINE;
+  if (!D) {
+    document.getElementById('status').textContent = '数据未载入';
+    say('ERROR: 未找到 window.TRACK_OUTLINE，请确认 outline/outline.js 已生成并在同目录结构中。');
+    return;
+  }
+
+  const LABEL = {
+    hill_start: '坡道定点停车与起步（俯视）',
+    s_curve: '曲线行驶（俯视）',
+    right_angle: '直角转弯（俯视）'
+  };
+
+  function bounds(proj) {
+    const pts = [];
+    const g = proj.ground;
+    (g.type === 'strip' ? g.left.concat(g.right) : g.points).forEach(p => pts.push(p));
+    proj.lines.forEach(l => { pts.push(...l.left, ...l.right); });
+    proj.poles.forEach(p => pts.push([p.x, p.y, p.z]));
+    const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+    return { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
+  }
+
+  function draw(canvas, proj) {
+    const W = canvas.width, H = canvas.height;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, W, H);
+    const b = bounds(proj);
+    const s = Math.min(W / ((b.x1 - b.x0) * 1.12), H / ((b.y1 - b.y0) * 1.12));
+    const cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2;
+    const X = x => W / 2 + (x - cx) * s;
+    const Y = y => H / 2 - (y - cy) * s;
+
+    // 地面
+    ctx.fillStyle = '#f2f4f6';
+    ctx.beginPath();
+    const g = proj.ground;
+    if (g.type === 'strip') {
+      g.left.forEach((p, i) => i ? ctx.lineTo(X(p[0]), Y(p[1])) : ctx.moveTo(X(p[0]), Y(p[1])));
+      [...g.right].reverse().forEach(p => ctx.lineTo(X(p[0]), Y(p[1])));
+    } else {
+      g.points.forEach((p, i) => i ? ctx.lineTo(X(p[0]), Y(p[1])) : ctx.moveTo(X(p[0]), Y(p[1])));
+    }
+    ctx.closePath(); ctx.fill();
+
+    // 标线：left 正序 + right 逆序
+    proj.lines.forEach(l => {
+      ctx.fillStyle = l.kind === 'stop_pole_line' ? '#1c2026'
+                    : l.kind === 'control_line' ? '#7b828b' : '#4a5058';
+      ctx.beginPath();
+      l.left.forEach((p, i) => i ? ctx.lineTo(X(p[0]), Y(p[1])) : ctx.moveTo(X(p[0]), Y(p[1])));
+      [...l.right].reverse().forEach(p => ctx.lineTo(X(p[0]), Y(p[1])));
+      ctx.closePath(); ctx.fill();
+    });
+
+    // 桩杆
+    ctx.fillStyle = '#8b929b';
+    proj.poles.forEach(p => {
+      ctx.beginPath(); ctx.arc(X(p.x), Y(p.y), Math.max(2, p.radius * s), 0, Math.PI * 2); ctx.fill();
+    });
+
+    // 解析圆弧（判定层用），Canvas 2D 的 y 向下 → 角度取负、起止互换
+    if (document.getElementById('showArcs').checked) {
+      ctx.strokeStyle = '#1858a5'; ctx.lineWidth = 2; ctx.setLineDash([6, 5]);
+      proj.arcs.forEach(a => {
+        [a.outerRadius, a.innerRadius].forEach(r => {
+          ctx.beginPath();
+          ctx.arc(X(a.center[0]), Y(a.center[1]), r * s, -a.endAngle, -a.startAngle,
+                  a.direction === 'cw');
+          ctx.stroke();
+        });
+      });
+      ctx.setLineDash([]);
+    }
+
+    if (document.getElementById('showIds').checked) {
+      ctx.fillStyle = '#1858a5'; ctx.font = '11px sans-serif';
+      proj.lines.forEach((l, i) => {
+        const p = l.left[Math.floor(l.left.length / 2)];
+        if (p) ctx.fillText(l.id, X(p[0]) + 5, Y(p[1]) - 6 - i * 2);
+      });
+    }
+    return { scale: s, points: proj.lines.reduce((n, l) => n + l.left.length + l.right.length, 0) };
+  }
+
+  let totalPoints = 0, totalLines = 0, bad = 0;
+  Object.keys(D.projects).forEach(key => {
+    const proj = D.projects[key];
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = '<h2>' + (LABEL[key] || key) + '</h2><p>' + proj.lines.length +
+                     ' 条标线 · ' + proj.arcs.length + ' 段解析弧 · ' + proj.poles.length + ' 根桩杆</p>';
+    const cv = document.createElement('canvas');
+    cv.width = 760; cv.height = 420;
+    card.appendChild(cv);
+    document.getElementById('grid').appendChild(card);
+
+    // 坐标合法性检查（能证伪：任一 NaN / 非有限值立即报错）
+    const all = [];
+    proj.lines.forEach(l => all.push(...l.left, ...l.right));
+    (proj.ground.type === 'strip' ? proj.ground.left.concat(proj.ground.right) : proj.ground.points)
+      .forEach(p => all.push(p));
+    const invalid = all.filter(p => p.length < 2 || !p.every(Number.isFinite));
+    bad += invalid.length;
+    totalPoints += all.length;
+    totalLines += proj.lines.length;
+    const r = draw(cv, proj);
+    say('[' + key + '] 标线 ' + proj.lines.length + ' 条，坐标点 ' + all.length +
+        ' 个，非法 ' + invalid.length + ' 个，比例 ' + r.scale.toFixed(2) + ' px/m');
+  });
+
+  document.getElementById('showArcs').addEventListener('change', () => {
+    document.querySelectorAll('canvas').forEach((cv, i) => draw(cv, D.projects[Object.keys(D.projects)[i]]));
+  });
+  document.getElementById('showIds').addEventListener('change', () => {
+    document.querySelectorAll('canvas').forEach((cv, i) => draw(cv, D.projects[Object.keys(D.projects)[i]]));
+  });
+
+  const ok = bad === 0;
+  const st = document.getElementById('status');
+  st.textContent = ok ? '✓ 可直接消费：' + totalLines + ' 条标线 / ' + totalPoints + ' 个坐标全部有限'
+                      : '✗ 发现 ' + bad + ' 个非法坐标';
+  st.className = 'badge' + (ok ? ' ok' : '');
+  say(ok ? '结论：轮廓坐标可直接喂给 Canvas 2D（仅用 moveTo/lineTo/arc/fill，无额外数据依赖）。'
+         : '结论：数据不合规，不要接进 Canvas 2D。');
+})();
+</script>
+</body>
+</html>
