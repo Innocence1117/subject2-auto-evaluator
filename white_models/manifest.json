@@ -1,0 +1,49 @@
+{
+  "blender": "4.5.3 LTS",
+  "engine": "BLENDER_WORKBENCH",
+  "source": "outline/outline.json <- track/track.wang.json",
+  "projects": {
+    "hill_start": {
+      "file": "white_models/hill_start.blend",
+      "objects": 10,
+      "meshes": 8,
+      "vertices": 100,
+      "lines": 5,
+      "poles": 2,
+      "materials": 0,
+      "lights": 0,
+      "images": 0,
+      "cameras": 2
+    },
+    "s_curve": {
+      "file": "white_models/s_curve.blend",
+      "objects": 4,
+      "meshes": 3,
+      "vertices": 736,
+      "lines": 2,
+      "poles": 0,
+      "materials": 0,
+      "lights": 0,
+      "images": 0,
+      "cameras": 1
+    },
+    "right_angle": {
+      "file": "white_models/right_angle.blend",
+      "objects": 4,
+      "meshes": 3,
+      "vertices": 18,
+      "lines": 2,
+      "poles": 0,
+      "materials": 0,
+      "lights": 0,
+      "images": 0,
+      "cameras": 1
+    }
+  },
+  "assertions": {
+    "noMaterials": true,
+    "noLights": true,
+    "noTextures": true,
+    "groundPlusLinesOnly": true
+  }
+}

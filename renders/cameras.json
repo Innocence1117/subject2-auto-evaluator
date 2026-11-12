@@ -1,0 +1,62 @@
+{
+  "hill_top": {
+    "view": "top",
+    "project": "hill_start",
+    "clean": "renders/clean/hill_top.png",
+    "res": [
+      1800,
+      1100
+    ],
+    "orthoScale": 31.248833060703763,
+    "center": [
+      13.950371902099892,
+      0.75
+    ],
+    "pxPerMeter": 57.602150982832946
+  },
+  "hill_section": {
+    "view": "section",
+    "project": "hill_start",
+    "clean": "renders/clean/hill_section.png",
+    "res": [
+      2400,
+      450
+    ],
+    "orthoScale": 31.248833060703763,
+    "center": [
+      13.950371902099892,
+      0.625
+    ],
+    "pxPerMeter": 76.8028679771106
+  },
+  "s_curve_top": {
+    "view": "top",
+    "project": "s_curve",
+    "clean": "renders/clean/s_curve_top.png",
+    "res": [
+      1800,
+      1100
+    ],
+    "orthoScale": 32.519134572592165,
+    "center": [
+      11.56586399182265,
+      -4.065863991822649
+    ],
+    "pxPerMeter": 55.35202654246153
+  },
+  "right_angle_top": {
+    "view": "top",
+    "project": "right_angle",
+    "clean": "renders/clean/right_angle_top.png",
+    "res": [
+      1800,
+      1100
+    ],
+    "orthoScale": 18.90589090909091,
+    "center": [
+      3.755,
+      3.2300000000000004
+    ],
+    "pxPerMeter": 95.20841988644231
+  }
+}

@@ -1,0 +1,15 @@
+# 3D 资产不进主干（本周纪律第 2 条）；.blend 只出现在 assets 分支
+white_models/*.blend
+white_models/*.blend1
+
+# GitHub token / 离线包：绝不提交
+.github_token
+.github_token.*
+*.bundle
+
+# Python / 编辑器 / 系统
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.workbuddy/
