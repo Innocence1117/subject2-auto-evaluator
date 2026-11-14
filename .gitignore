@@ -1,3 +1,6 @@
 node_modules
 .DS_Store
 dist
+# 白模渲染图不入库（作者自行留存）
+models/*.png
+models/*.jpg
