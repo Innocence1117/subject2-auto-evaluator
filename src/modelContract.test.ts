@@ -88,7 +88,7 @@ describe("资产坐标契约", () => {
 
       if (expectMap.leftIsNegativeZ) {
         it("左侧车轮在 -Z", () => {
-          const left = (entry.frontAxleObjects ?? []).filter((n) => n.endsWith("_L"));
+          const left = (entry.frontAxleObjects ?? []).filter((n) => n.endsWith("L"));
           expect(left.length, "找不到左侧车轮 object").toBeGreaterThan(0);
           for (const name of left) {
             expect(stats.objects[name].max[2]).toBeLessThan(0);
