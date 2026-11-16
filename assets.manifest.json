@@ -1,0 +1,43 @@
+{
+  "$comment": "资产坐标契约。改 translate 之前先读 docs/coords.md 第 7 节。这里记录的是『这个资产自己的坐标系长什么样』，加载时由代码吸收，不要求建模的人改文件。",
+  "version": 1,
+  "tolerance": 0.001,
+  "assets": {
+    "models/最简桑塔纳白模.obj": {
+      "owner": "陈林楠",
+      "up": "Y",
+      "origin": {
+        "note": "原点在车身几何中心，不在后轴中心",
+        "translateToRearAxle": [1.2365, 0, 0],
+        "reason": "后轴位于模型 X = -1.2365；加 +1.2365 后后轴落在 0，整车 X 变成 -1.000 .. 3.473"
+      },
+      "frontAxleObjects": ["Wheel_FL", "Wheel_FR"],
+      "rearAxleObjects": ["Wheel_RL", "Wheel_RR"],
+      "expect": {
+        "lengthX": 4.473,
+        "widthZ": 1.706,
+        "heightY": 1.469,
+        "wheelbase": 2.603,
+        "trackWidth": 1.42,
+        "minY": 0.0,
+        "leftIsNegativeZ": true
+      }
+    },
+    "models/场地白模.obj": {
+      "owner": "陈林楠 / 王梓钰",
+      "up": "Y",
+      "origin": {
+        "note": "与 track.json 共用同一套考场坐标（coords.md §5.1），不需要任何变换",
+        "translateToRearAxle": [0, 0, 0]
+      },
+      "expect": {
+        "lengthX": 40.0,
+        "widthZ": 40.0
+      },
+      "warnings": [
+        "标线宽 0.030 m，规范是 0.15 m（差 5 倍），待场地定稿时统一",
+        "当前只含倒车入库与侧方停车，坡道 / 曲线 / 直角未交"
+      ]
+    }
+  }
+}
